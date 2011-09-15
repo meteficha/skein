@@ -16,11 +16,12 @@
 ** 
 ********************************************************************/
 
-#include "brg_types.h"                      /* get integer type definitions */
+/* 2011-09-15: Modified to avoid brg_types and include stdint.h */
+#include <stdint.h>
 
 typedef unsigned int    uint_t;             /* native unsigned integer */
-typedef uint_8t         u08b_t;             /*  8-bit unsigned integer */
-typedef uint_64t        u64b_t;             /* 64-bit unsigned integer */
+typedef uint8_t         u08b_t;             /*  8-bit unsigned integer */
+typedef uint64_t        u64b_t;             /* 64-bit unsigned integer */
 
 /*
  * Skein is "natively" little-endian (unlike SHA-xxx), for optimal
