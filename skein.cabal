@@ -39,10 +39,14 @@ Flag reference
 
 
 Library
-    -- Exposed-modules:
-    -- Build-depends:
-    -- Other-modules:
-    -- Build-tools:
+    Hs-Source-Dirs: src
+
+    Exposed-modules:
+        Crypto.Skein.Internal
+
+    Build-depends:
+        base         >= 3   && < 5,
+        bytestring   >= 0.9 && < 0.10
 
     Extensions:  CPP, ForeignFunctionInterface
     Build-tools: hsc2hs
