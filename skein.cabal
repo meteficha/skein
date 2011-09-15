@@ -10,20 +10,64 @@ Category:            Cryptography
 Build-type:          Simple
 
 Description:
-   Skein (<http://www.skein-hash.info/) is a family of fast
-   secure cryptographic hash functions.  This package provides
-   high-level Haskell bindings to the optimized C implementation.
+    Skein (<http://www.skein-hash.info/) is a family of fast
+    secure cryptographic hash functions.  This package provides
+    high-level Haskell bindings to the optimized C implementation.
 
--- Extra files to be distributed with the package, such as examples or
--- a README.
--- Extra-source-files:
+Extra-source-files:
+    c_impl/optimized/brg_endian.h
+    c_impl/optimized/brg_types.h
+    c_impl/optimized/skein.c
+    c_impl/optimized/skein.h
+    c_impl/optimized/skein_block.c
+    c_impl/optimized/skein_debug.c
+    c_impl/optimized/skein_debug.h
+    c_impl/optimized/skein_iv.h
+    c_impl/optimized/skein_port.h
+    c_impl/reference/brg_endian.h
+    c_impl/reference/brg_types.h
+    c_impl/reference/skein.c
+    c_impl/reference/skein.h
+    c_impl/reference/skein_block.c
+    c_impl/reference/skein_debug.c
+    c_impl/reference/skein_debug.h
+    c_impl/reference/skein_port.h
+
 
 -- Constraint on the version of Cabal needed to build this package.
 Cabal-version:       >=1.2
 
 
+Flag reference
+    Description: Use the reference implementation instead of the optimized one.
+    Default: False
+
+
+
 Library
-  -- Exposed-modules:
-  -- Build-depends:
-  -- Other-modules:
-  -- Build-tools:
+    -- Exposed-modules:
+    -- Build-depends:
+    -- Other-modules:
+    -- Build-tools:
+
+    if flag(reference)
+        C-sources:
+            c_impl/reference/brg_endian.h
+            c_impl/reference/brg_types.h
+            c_impl/reference/skein.c
+            c_impl/reference/skein.h
+            c_impl/reference/skein_block.c
+            c_impl/reference/skein_debug.c
+            c_impl/reference/skein_debug.h
+            c_impl/reference/skein_port.h
+    else
+        C-sources:
+            c_impl/optimized/brg_endian.h
+            c_impl/optimized/brg_types.h
+            c_impl/optimized/skein.c
+            c_impl/optimized/skein.h
+            c_impl/optimized/skein_block.c
+            c_impl/optimized/skein_debug.c
+            c_impl/optimized/skein_debug.h
+            c_impl/optimized/skein_iv.h
+            c_impl/optimized/skein_port.h
