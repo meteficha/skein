@@ -50,12 +50,23 @@ Library
     -- Other-modules:
     -- Build-tools:
 
+    Extensions:  CPP, ForeignFunctionInterface
+    Build-tools: hsc2hs
+    GHC-options: -Wall
+
+    Includes:
+        skein.h
+
     if flag(reference)
+        Include-Dirs:
+            c_impl/reference
         C-sources:
             c_impl/reference/skein.c
             c_impl/reference/skein_block.c
          -- c_impl/reference/skein_debug.c -- not used
     else
+        Include-Dirs:
+            c_impl/optimized
         C-sources:
             c_impl/optimized/skein.c
             c_impl/optimized/skein_block.c
