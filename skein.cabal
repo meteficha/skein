@@ -54,9 +54,9 @@ Library
         C-sources:
             c_impl/reference/skein.c
             c_impl/reference/skein_block.c
-            c_impl/reference/skein_debug.c
+         -- c_impl/reference/skein_debug.c -- not used
     else
         C-sources:
             c_impl/optimized/skein.c
             c_impl/optimized/skein_block.c
-            c_impl/optimized/skein_debug.c
+         -- c_impl/optimized/skein_debug.c -- not used
