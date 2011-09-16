@@ -64,6 +64,7 @@ Library
     Includes:
         skein.h
 
+    CC-options: -O2
     if arch(i386) || arch(x86_64)
         CC-options: "-DSKEIN_NEED_SWAP=0"
     if arch(ppc) || arch(sparc)
