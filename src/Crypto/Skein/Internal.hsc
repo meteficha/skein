@@ -19,10 +19,11 @@
 -----------------------------------------------------------------------------
 
 module Crypto.Skein.Internal
-    ( -- * Constants
+    ( -- * Return codes
       sKEIN_SUCCESS
     , sKEIN_FAIL
     , sKEIN_BAD_HASHLEN
+    , check
 
       -- * Skein-256
     , Skein256Ctx(..)
@@ -69,6 +70,16 @@ sKEIN_SUCCESS     = #{const SKEIN_SUCCESS}
 sKEIN_FAIL        = #{const SKEIN_FAIL}
 sKEIN_BAD_HASHLEN = #{const SKEIN_BAD_HASHLEN}
 
+-- | Throws exception if the function does not return
+-- successfully.
+check :: IO CInt -> IO ()
+check act = do
+  x <- act
+  case () of
+    () | x == sKEIN_SUCCESS     -> return ()
+       | x == sKEIN_FAIL        -> fail "Skein returned FAIL."
+       | x == sKEIN_BAD_HASHLEN -> fail "Skein returned BAD_HASHLEN."
+       | otherwise              -> fail "Skein returned unknown code."
 
 newtype Skein256Ctx  = S256Ctx  {unS256Ctx  :: B.ByteString}
 newtype Skein512Ctx  = S512Ctx  {unS512Ctx  :: B.ByteString}
