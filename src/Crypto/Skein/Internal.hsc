@@ -51,6 +51,9 @@ module Crypto.Skein.Internal
     , skein1024InitExt
     , skein1024FinalPad
     , skein1024Output
+
+      -- * Misc constants
+    , sKEIN_SEQUENTIAL
     ) where
 
 -- from base
@@ -144,3 +147,7 @@ foreign import ccall unsafe "skein.h Skein_256_Output" skein256Output  :: Ptr Sk
 foreign import ccall unsafe "skein.h Skein_512_Output" skein512Output  :: Ptr Skein512Ctx  -> Ptr Word8 -> IO CInt
 foreign import ccall unsafe "skein.h Skein1024_Output" skein1024Output :: Ptr Skein1024Ctx -> Ptr Word8 -> IO CInt
 
+
+-- | Pass to @InitExt@ to get sequential processing.
+sKEIN_SEQUENTIAL :: Word64
+sKEIN_SEQUENTIAL = 0
