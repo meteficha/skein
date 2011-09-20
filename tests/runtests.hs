@@ -1,20 +1,16 @@
 -- from base
 import Control.Applicative ((<$>))
-import Control.Monad (forM_, unless, replicateM)
+import Control.Monad (forM_, unless)
 import Data.Char (isNumber)
 import Data.Maybe (catMaybes)
-import Foreign
-import Foreign.C
 import Text.Printf
 
 -- from bytestring
 import qualified Data.ByteString as B
-import qualified Data.ByteString.Lazy as L
-import qualified Data.ByteString.Internal as BI
-import qualified Data.ByteString.Unsafe as BU
+--import qualified Data.ByteString.Lazy as L
 
 -- from cereal
-import Data.Serialize
+import Data.Serialize (encode)
 
 -- from tagged
 import Data.Tagged (Tagged(..))
@@ -26,18 +22,12 @@ import Crypto.Classes
 -- from filepath
 import System.FilePath ((</>))
 
--- from HUnit
-import Test.HUnit
-
--- from QuickCheck
-import Test.QuickCheck hiding (property)
-
 -- from transformers
 import Control.Monad.Trans.Writer.Lazy (Writer)
 
 -- from hspec
 import Test.Hspec.Monadic
-import Test.Hspec.QuickCheck
+--import Test.Hspec.QuickCheck
 import Test.Hspec.HUnit ()
 
 
@@ -68,19 +58,6 @@ main = do
            skeinKats kats (undefined :: Skein_512_384)
            skeinKats kats (undefined :: Skein_1024_384)
            skeinKats kats (undefined :: Skein_1024_512)
-         describe "Skein-512-512 generic tests"   $ skeinTests (undefined :: Skein_512_512)
-         describe "Skein-1024-1024 generic tests" $ skeinTests (undefined :: Skein_1024_1024)
-         describe "Skein-256-256 generic tests"   $ skeinTests (undefined :: Skein_256_256)
-         describe "Skein-256-128 generic tests"   $ skeinTests (undefined :: Skein_256_128)
-         describe "Skein-256-160 generic tests"   $ skeinTests (undefined :: Skein_256_160)
-         describe "Skein-256-224 generic tests"   $ skeinTests (undefined :: Skein_256_224)
-         describe "Skein-512-128 generic tests"   $ skeinTests (undefined :: Skein_512_128)
-         describe "Skein-512-160 generic tests"   $ skeinTests (undefined :: Skein_512_160)
-         describe "Skein-512-224 generic tests"   $ skeinTests (undefined :: Skein_512_224)
-         describe "Skein-512-256 generic tests"   $ skeinTests (undefined :: Skein_512_256)
-         describe "Skein-512-384 generic tests"   $ skeinTests (undefined :: Skein_512_384)
-         describe "Skein-1024-384 generic tests"  $ skeinTests (undefined :: Skein_1024_384)
-         describe "Skein-1024-512 generic tests"  $ skeinTests (undefined :: Skein_1024_512)
 
 readMsg :: Read a => String -> String -> a
 readMsg msg str = case readsPrec 0 str of
@@ -130,7 +107,7 @@ isTree []     = False
 
 parseMsgLen :: String -> Int
 parseMsgLen ('m':'s':'g':'L':'e':'n':' ':'=':xs) = readMsg "parseMsgLen" $ take 6 xs
-parseMsgLen (x:xs) = parseMsgLen xs
+parseMsgLen (_:xs) = parseMsgLen xs
 parseMsgLen []     = error "parseMsgLen: didn't find msgLen"
 
 parseSkeinType :: String -> SkeinType
@@ -138,7 +115,7 @@ parseSkeinType xs0 =
     let (":Skein", '-':xs1) = break (== '-') xs0
         (stateS,   xs2)     = span isNumber xs1
         (':':_,    xs3)     = break isNumber xs2
-        (outputS,  xs4)     = span isNumber xs3
+        (outputS,  _)       = span isNumber xs3
     in Skein (readMsg "stateS" stateS) (readMsg "outputS" outputS)
 
 data Block = Message B.ByteString | MACKey B.ByteString | Result B.ByteString
@@ -172,10 +149,16 @@ skeinKats kats digest =
 
             p = f t `asTypeOf` digest
       skeinType = Skein (get blockLength) (get outputLength)
-      myHashKats = [(msg,         ret) | Kat t msg Nothing       ret <- kats, t == skeinType]
-      myMacKats  = [(msg, macKey, ret) | Kat t msg (Just macKey) ret <- kats, t == skeinType]
-  in it (printf "works for %s (%d hash tests, %d MAC tests)"
-                (show skeinType) (length myHashKats) (length myMacKats)) $ do
+      myHashKats  = [(msg,         ret) | Kat t msg Nothing       ret <- kats, t == skeinType]
+      myMacKats   = [(msg, macKey, ret) | Kat t msg (Just macKey) ret <- kats, t == skeinType]
+      lenHashKats = length myHashKats
+      lenMacKats  = length myMacKats
+      testName =
+          if lenHashKats + lenMacKats == 0
+          then printf "has no tests for %s =(" (show skeinType)
+          else printf "works for %s (%d hash tests, %d MAC tests)"
+                      (show skeinType) lenHashKats lenMacKats
+  in it testName $ do
        putStrLn "Testing hashes..."
        forM_ myHashKats $ \(msg, ret) -> do
          let myHash = hash' msg `asTypeOf` digest
@@ -189,12 +172,3 @@ skeinKats kats digest =
                                                        "MAC Key: ", show macKey,
                                                        "\nExpected: ", show ret,
                                                        "\nCalculated: ", show (encode myMAC)]
-
-
-----------------------------------------------------------------------
-
-skeinTests :: (SkeinMAC skeinCtx, Hash skeinCtx digest) => digest -> Writer [ItSpec] ()
-skeinTests digest = do
-  return ()
-
-
