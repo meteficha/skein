@@ -8,21 +8,35 @@
 -- Stability   :  provisional
 -- Portability :  portable (needs FFI)
 --
---
+-- High-level interface for the Skein family of hash functions.
 --
 -----------------------------------------------------------------------------
 
 module Crypto.Skein
-    ( -- * Main hash functions
+    ( -- * Using this module
+      -- $usingMod
+
+      -- ** Skein as a cryptographic hash function
+      -- $skeinAsHash
+
+      -- ** Skein as a message authentication code (MAC)
+      -- $skeinAsMAC
+
+      -- * About Skein
+      -- $about
+
+      -- * Main cryptographic hash functions
+      -- $mainHash
+
       -- ** Skein-512-512
-      Skein_512_512_Ctx
-    , Skein_512_512
-      -- ** Skein-256-256
-    , Skein_256_256_Ctx
-    , Skein_256_256
+      Skein_512_512
+    , Skein_512_512_Ctx
       -- ** Skein-1024-1024
-    , Skein_1024_1024_Ctx
     , Skein_1024_1024
+    , Skein_1024_1024_Ctx
+      -- ** Skein-256-256
+    , Skein_256_256
+    , Skein_256_256_Ctx
 
       -- * Skein-MAC
       -- $skeinmac
@@ -31,42 +45,45 @@ module Crypto.Skein
     , skeinMAC'
     , SkeinMAC (skeinMACCtx)
 
-      -- * Other variants
+      -- * Other variants of cryptographic hash functions
       -- $variants
+
       -- ** Skein-256-128
-    , Skein_256_128_Ctx
     , Skein_256_128
+    , Skein_256_128_Ctx
       -- ** Skein-256-160
-    , Skein_256_160_Ctx
     , Skein_256_160
+    , Skein_256_160_Ctx
       -- ** Skein-256-224
-    , Skein_256_224_Ctx
     , Skein_256_224
+    , Skein_256_224_Ctx
 
       -- * Skein-512
+
       -- ** Skein-512-128
-    , Skein_512_128_Ctx
     , Skein_512_128
+    , Skein_512_128_Ctx
       -- ** Skein-512-160
-    , Skein_512_160_Ctx
     , Skein_512_160
+    , Skein_512_160_Ctx
       -- ** Skein-512-224
-    , Skein_512_224_Ctx
     , Skein_512_224
+    , Skein_512_224_Ctx
       -- ** Skein-512-256
-    , Skein_512_256_Ctx
     , Skein_512_256
+    , Skein_512_256_Ctx
       -- ** Skein-512-384
-    , Skein_512_384_Ctx
     , Skein_512_384
+    , Skein_512_384_Ctx
 
       -- * Skein-1024
+
       -- ** Skein-1024-384
-    , Skein_1024_384_Ctx
     , Skein_1024_384
+    , Skein_1024_384_Ctx
       -- ** Skein-1024-512
-    , Skein_1024_512_Ctx
     , Skein_1024_512
+    , Skein_1024_512_Ctx
     ) where
 
 -- from base
@@ -94,6 +111,173 @@ import Crypto.Skein.Internal
 
 ----------------------------------------------------------------------
 
+-- $usingMod
+--
+-- Currently this module provides both Skein as a cryptographic
+-- hash function and Skein as a MAC.  This module currently does
+-- not provide some Skein functions, such as tree hashing,
+-- pseudo-random number generation, stream ciphing or key
+-- derivation.
+--
+-- Terminology note: we say \"message\" for your variable-sized
+-- data that is given to Skein.
+
+-- $skeinAsHash
+--
+-- There are many variants of Skein as a cryptographic hash
+-- function.  They are called @Skein_X_Y@, where @X@ is internal
+-- state size in bits and @Y@ is the output size in bits.  The
+-- main ones are 'Skein_512_512', 'Skein_1024_1024' and
+-- 'Skein_256_256'.  If you are unsure, then use 'Skein_512_512'.
+--
+-- To use these data types, you have to use 'Hash' and
+-- 'Serialize'.  Suppose you wanted to hash a lazy 'L.ByteString'
+-- @bs@.  Then you could use
+--
+-- @
+--   digest :: 'S.ByteString'
+--   digest = let h = 'hash' bs :: 'Skein_512_512'
+--            in 'encode' h
+-- @
+--
+-- where 'hash' is from "Crypto.Classes" (@crypto-api@ package),
+-- 'encode' is from 'Serialize' (@cereal@ package) and @digest@
+-- is a strict 'B.ByteString' with the hash.  Given that we've
+-- used 'Skein_512_512' which has an output size of 512 bits,
+-- @digest@ will have @512 / 8 = 64@ bytes of length.
+
+-- $skeinAsMAC
+--
+-- If you need a message authentication code (MAC), you may use
+-- HMAC with Skein (e.g. HMAC-Skein-512-512).  Using HMAC with
+-- Skein is supported and secure.  However, Skein also supports
+-- another secure method, called Skein-MAC.
+--
+-- Skein-MAC is as secure as HMAC with Skein, however with a much
+-- lower overhead (especially for short messages).  HMAC requires
+-- two hash invocations.  Skein-MAC, on the other hand, requires
+-- just one hash invocation after the setup.
+--
+-- To use Skein-MAC, you need 'skeinMAC' (or 'skeinMAC'') and
+-- 'Serialize'.  You also need a 'Key' with at least as many bits
+-- as the state size you choose (@256@, @512@ or @1024@ bits).
+--
+-- Suppose you want to use Skein-MAC with 'Skein_512_512'.  To
+-- setup the MAC function with a 'Key' @key@ (that has at least
+-- @512 / 8 = 64@ bytes), use
+--
+-- @
+--   let calcMAC :: 'L.ByteString' -> 'Skein_512_512'
+--       calcMAC = 'skeinMAC' key
+-- @
+--
+-- It is recommended to partially apply 'skeinMAC' (or
+-- 'skeinMAC'') to avoid recomputing the key setup.  We give an
+-- explicit type to 'calcMAC' because we have to choose which
+-- Skein we want.
+--
+-- Now, if you want to calculate the Skein-MAC of a lazy
+-- 'L.ByteString' message @msg@, use
+--
+-- @
+--   let msgMAC = 'encode' (calcMAC msg)
+-- @
+--
+-- where 'encode' is from 'Serialize' (@cereal@ package) and
+-- @msgMAC@ is a strict 'B.ByteString' with the MAC.
+--
+-- Now, suppose you are given a @msg'@ with MAC @msgMAC'@ and
+-- want to check the integrity and authenticity of @msg'@.  You
+-- may do so by calculating the MAC of @msg'@ and checking
+-- against @msgMAC'@:
+--
+-- @
+--   let msgMAC'' = 'encode' (calcMAC msg')
+--   in if msgMAC' == msgMAC''
+--      then Right \"Message is okay\"
+--      else Left \"Message has been corrupted or tampered with\"
+-- @
+
+-- $about
+--
+-- From <http://www.skein-hash.info/about> at 09/2011:
+--
+-- Skein is a new family of cryptographic hash functions. Its
+-- design combines speed, security, simplicity, and a great deal
+-- of flexibility in a modular package that is easy to analyze.
+--
+-- Skein is fast. Skein-512 -- our primary proposal -- hashes data at
+-- 6.1 clock cycles per byte on a 64-bit CPU. This means that on
+-- a 3.1 GHz x64 Core 2 Duo CPU, Skein hashes data at 500
+-- MBytes/second per core -- almost twice as fast as SHA-512 and
+-- three times faster than SHA-256. An optional hash-tree mode
+-- speeds up parallelizable implementations even more. Skein is
+-- fast for short messages, too; Skein-512 hashes short messages
+-- in about 1000 clock cycles.
+--
+-- Skein is secure. Our current best attack on Skein-512 is on 25
+-- of 72 rounds, for a safety factor of 2.9. For comparison, at a
+-- similar stage in the standardization process, the AES
+-- encryption algorithm had an attack on 6 of 10 rounds, for a
+-- safety factor of only 1.7. Additionally, Skein has a number of
+-- provably secure properties, increasing confidence in the
+-- algorithm.
+--
+-- Skein is simple. Using only three primitive operations, the
+-- Skein compression function can be easily understood and
+-- remembered. The rest of the algorithm is a straightforward
+-- iteration of this function.
+--
+-- Skein is flexible. Skein is defined for three different
+-- internal state sizes -- 256 bits, 512 bits, and 1024 bits --
+-- and any output size. This allows Skein to be a drop-in
+-- replacement for the entire SHA family of hash functions. A
+-- completely optional and extendable argument system makes Skein
+-- an efficient tool to use for a very large number of functions:
+-- a PRNG, a stream cipher, a key derivation function,
+-- authentication without the overhead of HMAC, and a
+-- personalization capability. All these features can be
+-- implemented with very low overhead. Together with the
+-- Threefish large-block cipher at Skein core, this design
+-- provides a full set of symmetric cryptographic primitives
+-- suitable for most modern applications.
+--
+-- Skein is efficient on a variety of platforms, both hardware
+-- and software. Skein-512 can be implemented in about 200 bytes
+-- of state. Small devices, such as 8-bit smart cards, can
+-- implement Skein-256 using about 100 bytes of memory. Larger
+-- devices can implement the larger versions of Skein to achieve
+-- faster speeds.
+--
+-- Skein was designed by a team of highly experienced
+-- cryptographic experts from academia and industry, with
+-- expertise in cryptography, security analysis, software, chip
+-- design, and implementation of real-world cryptographic
+-- systems. This breadth of knowledge allowed them to create a
+-- balanced design that works well in all environments.
+
+-- $mainHash
+--
+-- These are the main Skein hash functions.  Unless you have any
+-- special reasons, you should use one of these.
+--
+--   ['Skein_512_512'] is the primary cryptographic hash function
+--   of this package.  It can safely be used for all current
+--   hashing applications, and should remain secure for the
+--   foreseeable future.
+--
+--   ['Skein_1024_1024'] is the ultra-conservative variant.  Even
+--   if some future attack managed to break 'Skein_512_512', it
+--   is quite likely that 'Skein_1024_1024' would remain secure.
+--
+--   ['Skein_256_256'] is the low-memory variant.  It can be
+--   implemented using 100 bytes of RAM, but this is not the case
+--   with this implementation.  It is faster than 'Skein_512_512'
+--   only for small message lengths, so it's preferable to use
+--   'Skein_512_512'.  If you can't afford 512 bits of output,
+--   you may get the speed advantage of 'Skein_512_512' by using
+--   'Skein_512_256'.
+
 -- $variants
 --
 -- These hash functions produce less output bits than their state
@@ -105,7 +289,7 @@ import Crypto.Skein.Internal
 --
 -- You may replace:
 --
---   [MD5] with 'Skein_256_128' or 'Skein_512_128'..
+--   [MD5] with 'Skein_256_128' or 'Skein_512_128'.
 --
 --   [SHA-1] with 'Skein_256_160' or 'Skein_512_160'.
 --

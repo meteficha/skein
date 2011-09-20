@@ -14,7 +14,8 @@
 -- Portability :  portable (needs FFI)
 --
 -- Basic wrappers around the C library.  You shouldn't need to
--- use these functions.
+-- use these functions.  Instead, use the high-level
+-- "Crypto.Skein" module.
 --
 -----------------------------------------------------------------------------
 
