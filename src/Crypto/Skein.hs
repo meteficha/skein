@@ -193,9 +193,10 @@ skeinMAC k = go
 -- Should be faster for small 'B.ByteString'@s@.
 skeinMAC' :: (SkeinMAC skeinCtx, Hash skeinCtx digest) =>
              Key -> B.ByteString -> digest
-skeinMAC' k = finalize ctx
+skeinMAC' k = go
     where
       ctx = skeinMACCtx k
+      go  = finalize ctx
       -- We can just call 'finalize' because of the way our
       -- implementation works.  Basically, we accept ByteString
       -- of any length on both 'updateCtx' and 'finalize'.
