@@ -671,14 +671,14 @@ newtype Skein_512_512 = S_512_512 B.ByteString deriving (Eq, Ord)
 
 instance Serialize Skein_512_512 where
     put (S_512_512 bs) = putByteString bs
-    get = fmap S_512_512 $ getByteString 32
+    get = fmap S_512_512 $ getByteString 64
 
 instance Hash Skein_512_512_Ctx Skein_512_512 where
     outputLength = Tagged 512
     blockLength  = Tagged 512
     initialCtx   = initialCtxSkein 512 skein512Init S_512_512_Ctx
     updateCtx    = updateCtxSkein skein512Update unS_512_512_Ctx S_512_512_Ctx
-    finalize     = finalizeSkein 32 skein512Update skein512Final unS_512_512_Ctx S_512_512
+    finalize     = finalizeSkein 64 skein512Update skein512Final unS_512_512_Ctx S_512_512
 
 instance SkeinMAC Skein_512_512_Ctx where
     skeinMACCtx = skeinMACCtxSkein 512 skein512InitExt S_512_512_Ctx
