@@ -3,9 +3,8 @@ Version:             0.1
 Synopsis:            Skein is a family of fast secure cryptographic hash functions.
 License:             BSD3
 License-file:        LICENSE
-Author:              Felipe Lessa
-Maintainer:          felipe.lessa@gmail.com
--- Copyright:
+Author:              Felipe Lessa <felipe.lessa@gmail.com>, Doug Whiting
+Maintainer:          Felipe Lessa <felipe.lessa@gmail.com>
 Category:            Cryptography
 Build-type:          Simple
 
