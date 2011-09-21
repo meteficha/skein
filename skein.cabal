@@ -1,6 +1,7 @@
+Cabal-version:       >= 1.8
 Name:                skein
 Version:             0.1
-Synopsis:            Skein, a family of fast secure cryptographic hash functions.  Includes Skein-MAC as well.
+Synopsis:            Skein, a family of cryptographic hash functions.  Includes Skein-MAC as well.
 License:             BSD3
 License-file:        LICENSE
 Author:              Felipe Lessa <felipe.lessa@gmail.com>, Doug Whiting
@@ -44,13 +45,13 @@ Extra-source-files:
 Data-files:
     tests/skein_golden_kat.txt
 
-Cabal-version:       >= 1.8
-
+Source-repository head
+  Type:     darcs
+  Location: http://patch-tag.com/r/felipe/skein
 
 Flag reference
     Description: Use the reference implementation instead of the optimized one.
     Default: False
-
 
 
 Library
@@ -79,7 +80,6 @@ Library
     Includes:
         skein.h
 
-    CC-options: -O2
     if arch(i386) || arch(x86_64)
         CC-options: "-DSKEIN_NEED_SWAP=0"
     if arch(ppc) || arch(sparc)
