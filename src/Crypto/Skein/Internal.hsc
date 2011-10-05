@@ -136,9 +136,9 @@ foreign import ccall unsafe "skein.h Skein_256_Final" skein256Final  :: Ptr Skei
 foreign import ccall unsafe "skein.h Skein_512_Final" skein512Final  :: Ptr Skein512Ctx  -> Ptr Word8 -> IO CInt
 foreign import ccall unsafe "skein.h Skein1024_Final" skein1024Final :: Ptr Skein1024Ctx -> Ptr Word8 -> IO CInt
 
-foreign import ccall unsafe "skein.h Skein_256_InitExt " skein256InitExt   :: Ptr Skein256Ctx  -> CSize -> Word64 -> Ptr Word8 -> CSize -> IO CInt
-foreign import ccall unsafe "skein.h Skein_512_InitExt " skein512InitExt   :: Ptr Skein512Ctx  -> CSize -> Word64 -> Ptr Word8 -> CSize -> IO CInt
-foreign import ccall unsafe "skein.h Skein1024_InitExt " skein1024InitExt  :: Ptr Skein1024Ctx -> CSize -> Word64 -> Ptr Word8 -> CSize -> IO CInt
+foreign import ccall unsafe "skein.h Skein_256_InitExt" skein256InitExt   :: Ptr Skein256Ctx  -> CSize -> Word64 -> Ptr Word8 -> CSize -> IO CInt
+foreign import ccall unsafe "skein.h Skein_512_InitExt" skein512InitExt   :: Ptr Skein512Ctx  -> CSize -> Word64 -> Ptr Word8 -> CSize -> IO CInt
+foreign import ccall unsafe "skein.h Skein1024_InitExt" skein1024InitExt  :: Ptr Skein1024Ctx -> CSize -> Word64 -> Ptr Word8 -> CSize -> IO CInt
 
 foreign import ccall unsafe "skein.h Skein_256_Final_Pad" skein256FinalPad  :: Ptr Skein256Ctx  -> Ptr Word8 -> IO CInt
 foreign import ccall unsafe "skein.h Skein_512_Final_Pad" skein512FinalPad  :: Ptr Skein512Ctx  -> Ptr Word8 -> IO CInt
