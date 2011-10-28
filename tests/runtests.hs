@@ -140,7 +140,7 @@ parseData xs = B.pack $ map (readMsg "parseData" . ("0x"++)) $ concatMap words x
 ----------------------------------------------------------------------
 
 skeinKats :: (SkeinMAC skeinCtx, Hash skeinCtx digest) =>
-             [Kat] -> digest -> Writer [ItSpec] ()
+             [Kat] -> digest -> Writer [Spec] ()
 skeinKats kats digest =
   let get t@(Tagged x) = x
           where

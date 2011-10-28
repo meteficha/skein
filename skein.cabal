@@ -112,7 +112,7 @@ Test-suite runtests
 
         filepath     == 1.*,
         transformers,
-        hspec        == 0.6.*,
+        hspec        == 0.9.*,
 
         -- finally, our own package
         skein
