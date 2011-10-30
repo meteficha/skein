@@ -1,6 +1,6 @@
 Cabal-version:       >= 1.8
 Name:                skein
-Version:             0.1.0.2
+Version:             0.1.0.3
 Synopsis:            Skein, a family of cryptographic hash functions.  Includes Skein-MAC as well.
 License:             BSD3
 License-file:        LICENSE
@@ -41,6 +41,7 @@ Extra-source-files:
     c_impl/reference/skein_debug.c
     c_impl/reference/skein_debug.h
     c_impl/reference/skein_port.h
+    tests/runtests.hs
 
 Data-files:
     tests/skein_golden_kat.txt
