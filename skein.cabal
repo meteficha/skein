@@ -54,6 +54,13 @@ Flag reference
     Description: Use the reference implementation instead of the optimized one.
     Default: False
 
+Flag force-endianness
+    Description: Use a manually selected endian when compiling (see flag 'big-endian').
+    Default: False
+
+Flag big-endian
+    Description: When manually selecting the endianness, use big-endian (default is little-endian).
+    Default: False
 
 Library
     Hs-Source-Dirs: src
@@ -81,10 +88,16 @@ Library
     Includes:
         skein.h
 
-    if arch(i386) || arch(x86_64)
-        CC-options: "-DSKEIN_NEED_SWAP=0"
-    if arch(ppc) || arch(sparc) || arch(s390)
-        CC-options: "-DSKEIN_NEED_SWAP=1"
+    if flag(force-endianness)
+        if flag(big-endian)
+            CC-options: "-DSKEIN_NEED_SWAP=1"
+        else
+            CC-options: "-DSKEIN_NEED_SWAP=0"
+    else
+        if arch(i386) || arch(x86_64)
+            CC-options: "-DSKEIN_NEED_SWAP=0"
+        if arch(ppc) || arch(sparc) || arch(s390)
+            CC-options: "-DSKEIN_NEED_SWAP=1"
 
     if flag(reference)
         Include-Dirs:
