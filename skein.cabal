@@ -8,6 +8,7 @@ Author:              Felipe Lessa <felipe.lessa@gmail.com>, Doug Whiting
 Maintainer:          Felipe Lessa <felipe.lessa@gmail.com>
 Category:            Cryptography
 Build-type:          Simple
+Homepage:            https://github.com/meteficha/skein
 
 Description:
     Skein (<http://www.skein-hash.info/>) is a family of fast
@@ -47,8 +48,8 @@ Data-files:
     tests/skein_golden_kat.txt
 
 Source-repository head
-  Type:     darcs
-  Location: http://patch-tag.com/r/felipe/skein
+  Type:     git
+  Location: git://github.com/meteficha/skein.git
 
 Flag reference
     Description: Use the reference implementation instead of the optimized one.
