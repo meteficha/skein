@@ -9,9 +9,6 @@ import Text.Printf
 import qualified Data.ByteString as B
 --import qualified Data.ByteString.Lazy as L
 
--- from cereal
-import Data.Serialize (encode)
-
 -- from tagged
 import Data.Tagged (Tagged(..))
 
@@ -21,9 +18,6 @@ import Crypto.Classes
 
 -- from filepath
 import System.FilePath ((</>))
-
--- from transformers
-import Control.Monad.Trans.Writer.Lazy (Writer)
 
 -- from hspec
 import Test.Hspec
