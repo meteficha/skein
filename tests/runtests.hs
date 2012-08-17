@@ -9,9 +9,6 @@ import Text.Printf
 import qualified Data.ByteString as B
 --import qualified Data.ByteString.Lazy as L
 
--- from cereal
-import Data.Serialize (encode)
-
 -- from tagged
 import Data.Tagged (Tagged(..))
 
@@ -22,14 +19,8 @@ import Crypto.Classes
 -- from filepath
 import System.FilePath ((</>))
 
--- from transformers
-import Control.Monad.Trans.Writer.Lazy (Writer)
-
 -- from hspec
-import Test.Hspec.Monadic
---import Test.Hspec.QuickCheck
-import Test.Hspec.HUnit ()
-
+import Test.Hspec
 
 -- from this package
 import Paths_skein (getDataFileName)
@@ -43,7 +34,7 @@ main = do
   skein_golden_kat_txt <- getDataFileName ("tests" </> "skein_golden_kat.txt")
   kats <- parseKats <$> readFile skein_golden_kat_txt
   putStrLn $ "Parsed " ++ show (length kats) ++ " known answer tests"
-  hspecX $ do
+  hspec $ do
          describe "Skein golden known answer tests" $ do
            skeinKats kats (undefined :: Skein_512_512)
            skeinKats kats (undefined :: Skein_1024_1024)
@@ -140,7 +131,7 @@ parseData xs = B.pack $ map (readMsg "parseData" . ("0x"++)) $ concatMap words x
 ----------------------------------------------------------------------
 
 skeinKats :: (SkeinMAC skeinCtx, Hash skeinCtx digest) =>
-             [Kat] -> digest -> Writer [Spec] ()
+             [Kat] -> digest -> Spec
 skeinKats kats digest =
   let get t@(Tagged x) = x
           where
