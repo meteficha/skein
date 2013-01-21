@@ -90,6 +90,7 @@ module Crypto.Skein
 import Control.Monad (unless)
 import Foreign
 import Foreign.C
+import qualified System.IO.Unsafe as U
 
 -- from bytestring
 import qualified Data.ByteString as B
@@ -396,7 +397,7 @@ initialCtxSkein :: Storable internalCtx =>
                 -> (internalCtx -> externalCtx)
                 -> externalCtx
 initialCtxSkein bits init_ mkCtx =
-    unsafePerformIO $
+    U.unsafePerformIO $
     alloca $ \ctx_ptr -> do
       check $ init_ ctx_ptr bits
       fmap mkCtx $ peek ctx_ptr
@@ -408,7 +409,7 @@ updateCtxSkein :: Storable internalCtx =>
                -> (internalCtx -> externalCtx)
                -> (externalCtx -> B.ByteString -> externalCtx)
 updateCtxSkein update unCtx mkCtx = \ctx bs ->
-    unsafePerformIO $
+    U.unsafePerformIO $
     BU.unsafeUseAsCStringLen bs $ \(bs_ptr, bs_len) ->
     with (unCtx ctx) $ \ctx_ptr -> do
       check $ update ctx_ptr (castPtr bs_ptr) (fromIntegral bs_len)
@@ -423,7 +424,7 @@ finalizeSkein :: Storable internalCtx =>
               -> (B.ByteString -> hash)
               -> (externalCtx -> B.ByteString -> hash)
 finalizeSkein hashLenBytes update final unCtx mkHash = \ctx bs ->
-    unsafePerformIO $
+    U.unsafePerformIO $
     with (unCtx ctx) $ \ctx_ptr -> do
       unless (B.null bs) $
         BU.unsafeUseAsCStringLen bs $ \(bs_ptr, bs_len) ->
@@ -437,7 +438,7 @@ skeinMACCtxSkein :: Storable internalCtx =>
                  -> (internalCtx -> externalCtx)
                  -> (Key -> externalCtx)
 skeinMACCtxSkein bits initExt mkCtx = \key ->
-    unsafePerformIO $
+    U.unsafePerformIO $
     BU.unsafeUseAsCStringLen key $ \(key_ptr, key_len) ->
     alloca $ \ctx_ptr -> do
       check $ initExt ctx_ptr bits sKEIN_SEQUENTIAL (castPtr key_ptr) (fromIntegral key_len)
