@@ -16,7 +16,7 @@
 ** 
 ********************************************************************/
 
-/* 2011-09-15: Modified to avoid brg_types and include stdint.h */
+/* 2013-03-30: Modified to avoid brg_types and include stdint.h */
 #include <stdint.h>
 
 typedef unsigned int    uint_t;             /* native unsigned integer */

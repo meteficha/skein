@@ -606,9 +606,8 @@ size_t Skein1024_API_CodeSize(void)
     }
 #endif
 
-#if SKEIN_TREE_HASH
-/**************** Functions to support tree hashing ***************/
-/* (this code is identical for Optimized and Reference versions)  */
+/**************** Functions to support MAC/tree hashing ***************/
+/*   (this code is identical for Optimized and Reference versions)    */
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /* finalize the hash computation and output the block, no OUTPUT stage */
@@ -658,6 +657,7 @@ int Skein1024_Final_Pad(Skein1024_Ctxt_t *ctx, u08b_t *hashVal)
     return SKEIN_SUCCESS;
     }
 
+#if SKEIN_TREE_HASH
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /* just do the OUTPUT stage                                       */
 int Skein_256_Output(Skein_256_Ctxt_t *ctx, u08b_t *hashVal)

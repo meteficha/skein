@@ -27,6 +27,10 @@
 **                                1: return SKEIN_FAIL to flag errors
 **
 ***************************************************************************/
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 #include <stddef.h>                          /* get size_t definition */
 #include "skein_port.h"                      /* get platform-specific definitions */
@@ -193,7 +197,7 @@ int  Skein1024_Output   (Skein1024_Ctxt_t *ctx, u08b_t * hashVal);
 
 #define SKEIN_MK_64(hi32,lo32)  ((lo32) + (((u64b_t) (hi32)) << 32))
 #define SKEIN_SCHEMA_VER        SKEIN_MK_64(SKEIN_VERSION,SKEIN_ID_STRING_LE)
-#define SKEIN_KS_PARITY         SKEIN_MK_64(0x55555555,0x55555555)
+#define SKEIN_KS_PARITY         SKEIN_MK_64(0x1BD11BDA,0xA9FC1A22)
 
 #define SKEIN_CFG_STR_LEN       (4*8)
 
@@ -202,12 +206,16 @@ int  Skein1024_Output   (Skein1024_Ctxt_t *ctx, u08b_t * hashVal);
 #define SKEIN_CFG_TREE_NODE_SIZE_POS  ( 8)
 #define SKEIN_CFG_TREE_MAX_LEVEL_POS  (16)
 
-#define SKEIN_CFG_TREE_LEAF_SIZE_MSK  ((u64b_t) 0xFF) << SKEIN_CFG_TREE_LEAF_SIZE_POS)
-#define SKEIN_CFG_TREE_NODE_SIZE_MSK  ((u64b_t) 0xFF) << SKEIN_CFG_TREE_NODE_SIZE_POS)
-#define SKEIN_CFG_TREE_MAX_LEVEL_MSK  ((u64b_t) 0xFF) << SKEIN_CFG_TREE_MAX_LEVEL_POS)
+#define SKEIN_CFG_TREE_LEAF_SIZE_MSK  (((u64b_t) 0xFF) << SKEIN_CFG_TREE_LEAF_SIZE_POS)
+#define SKEIN_CFG_TREE_NODE_SIZE_MSK  (((u64b_t) 0xFF) << SKEIN_CFG_TREE_NODE_SIZE_POS)
+#define SKEIN_CFG_TREE_MAX_LEVEL_MSK  (((u64b_t) 0xFF) << SKEIN_CFG_TREE_MAX_LEVEL_POS)
 
-#define SKEIN_CFG_TREE_INFO_SEQUENTIAL (0) /* use as treeInfo in InitExt() call for sequential processing */
-#define SKEIN_CFG_TREE_INFO(leaf,node,maxLevel) ((u64b_t) ((leaf) | ((node) << 8) | ((maxLevel) << 16)))
+#define SKEIN_CFG_TREE_INFO(leaf,node,maxLvl)                   \
+    ( (((u64b_t)(leaf  )) << SKEIN_CFG_TREE_LEAF_SIZE_POS) |    \
+      (((u64b_t)(node  )) << SKEIN_CFG_TREE_NODE_SIZE_POS) |    \
+      (((u64b_t)(maxLvl)) << SKEIN_CFG_TREE_MAX_LEVEL_POS) )
+
+#define SKEIN_CFG_TREE_INFO_SEQUENTIAL SKEIN_CFG_TREE_INFO(0,0,0) /* use as treeInfo in InitExt() call for sequential processing */
 
 /*
 **   Skein macros for getting/setting tweak words, etc.
@@ -272,34 +280,34 @@ int  Skein1024_Output   (Skein1024_Ctxt_t *ctx, u08b_t * hashVal);
 enum    
     {   
         /* Skein_256 round rotation constants */
-    R_256_0_0= 5, R_256_0_1=56,
-    R_256_1_0=36, R_256_1_1=28,
-    R_256_2_0=13, R_256_2_1=46,
-    R_256_3_0=58, R_256_3_1=44,
-    R_256_4_0=26, R_256_4_1=20,
-    R_256_5_0=53, R_256_5_1=35,
-    R_256_6_0=11, R_256_6_1=42,
-    R_256_7_0=59, R_256_7_1=50,
+    R_256_0_0=14, R_256_0_1=16,
+    R_256_1_0=52, R_256_1_1=57,
+    R_256_2_0=23, R_256_2_1=40,
+    R_256_3_0= 5, R_256_3_1=37,
+    R_256_4_0=25, R_256_4_1=33,
+    R_256_5_0=46, R_256_5_1=12,
+    R_256_6_0=58, R_256_6_1=22,
+    R_256_7_0=32, R_256_7_1=32,
 
         /* Skein_512 round rotation constants */
-    R_512_0_0=38, R_512_0_1=30, R_512_0_2=50, R_512_0_3=53,
-    R_512_1_0=48, R_512_1_1=20, R_512_1_2=43, R_512_1_3=31,
-    R_512_2_0=34, R_512_2_1=14, R_512_2_2=15, R_512_2_3=27,
-    R_512_3_0=26, R_512_3_1=12, R_512_3_2=58, R_512_3_3= 7,
-    R_512_4_0=33, R_512_4_1=49, R_512_4_2= 8, R_512_4_3=42,
-    R_512_5_0=39, R_512_5_1=27, R_512_5_2=41, R_512_5_3=14,
-    R_512_6_0=29, R_512_6_1=26, R_512_6_2=11, R_512_6_3= 9,
-    R_512_7_0=33, R_512_7_1=51, R_512_7_2=39, R_512_7_3=35,
+    R_512_0_0=46, R_512_0_1=36, R_512_0_2=19, R_512_0_3=37,
+    R_512_1_0=33, R_512_1_1=27, R_512_1_2=14, R_512_1_3=42,
+    R_512_2_0=17, R_512_2_1=49, R_512_2_2=36, R_512_2_3=39,
+    R_512_3_0=44, R_512_3_1= 9, R_512_3_2=54, R_512_3_3=56,
+    R_512_4_0=39, R_512_4_1=30, R_512_4_2=34, R_512_4_3=24,
+    R_512_5_0=13, R_512_5_1=50, R_512_5_2=10, R_512_5_3=17,
+    R_512_6_0=25, R_512_6_1=29, R_512_6_2=39, R_512_6_3=43,
+    R_512_7_0= 8, R_512_7_1=35, R_512_7_2=56, R_512_7_3=22,
 
         /* Skein1024 round rotation constants */
-    R1024_0_0=55, R1024_0_1=43, R1024_0_2=37, R1024_0_3=40, R1024_0_4=16, R1024_0_5=22, R1024_0_6=38, R1024_0_7=12,
-    R1024_1_0=25, R1024_1_1=25, R1024_1_2=46, R1024_1_3=13, R1024_1_4=14, R1024_1_5=13, R1024_1_6=52, R1024_1_7=57,
-    R1024_2_0=33, R1024_2_1= 8, R1024_2_2=18, R1024_2_3=57, R1024_2_4=21, R1024_2_5=12, R1024_2_6=32, R1024_2_7=54,
-    R1024_3_0=34, R1024_3_1=43, R1024_3_2=25, R1024_3_3=60, R1024_3_4=44, R1024_3_5= 9, R1024_3_6=59, R1024_3_7=34,
-    R1024_4_0=28, R1024_4_1= 7, R1024_4_2=47, R1024_4_3=48, R1024_4_4=51, R1024_4_5= 9, R1024_4_6=35, R1024_4_7=41,
-    R1024_5_0=17, R1024_5_1= 6, R1024_5_2=18, R1024_5_3=25, R1024_5_4=43, R1024_5_5=42, R1024_5_6=40, R1024_5_7=15,
-    R1024_6_0=58, R1024_6_1= 7, R1024_6_2=32, R1024_6_3=45, R1024_6_4=19, R1024_6_5=18, R1024_6_6= 2, R1024_6_7=56,
-    R1024_7_0=47, R1024_7_1=49, R1024_7_2=27, R1024_7_3=58, R1024_7_4=37, R1024_7_5=48, R1024_7_6=53, R1024_7_7=56
+    R1024_0_0=24, R1024_0_1=13, R1024_0_2= 8, R1024_0_3=47, R1024_0_4= 8, R1024_0_5=17, R1024_0_6=22, R1024_0_7=37,
+    R1024_1_0=38, R1024_1_1=19, R1024_1_2=10, R1024_1_3=55, R1024_1_4=49, R1024_1_5=18, R1024_1_6=23, R1024_1_7=52,
+    R1024_2_0=33, R1024_2_1= 4, R1024_2_2=51, R1024_2_3=13, R1024_2_4=34, R1024_2_5=41, R1024_2_6=59, R1024_2_7=17,
+    R1024_3_0= 5, R1024_3_1=20, R1024_3_2=48, R1024_3_3=41, R1024_3_4=47, R1024_3_5=28, R1024_3_6=16, R1024_3_7=25,
+    R1024_4_0=41, R1024_4_1= 9, R1024_4_2=37, R1024_4_3=31, R1024_4_4=12, R1024_4_5=47, R1024_4_6=44, R1024_4_7=30,
+    R1024_5_0=16, R1024_5_1=34, R1024_5_2=56, R1024_5_3=51, R1024_5_4= 4, R1024_5_5=53, R1024_5_6=42, R1024_5_7=41,
+    R1024_6_0=31, R1024_6_1=44, R1024_6_2=47, R1024_6_3=46, R1024_6_4=19, R1024_6_5=42, R1024_6_6=44, R1024_6_7=25,
+    R1024_7_0= 9, R1024_7_1=48, R1024_7_2=35, R1024_7_3=52, R1024_7_4=23, R1024_7_5=31, R1024_7_6=37, R1024_7_7=20
     };
 
 #ifndef SKEIN_ROUNDS
@@ -310,6 +318,10 @@ enum
 #define SKEIN_256_ROUNDS_TOTAL (8*((((SKEIN_ROUNDS/100) + 5) % 10) + 5))
 #define SKEIN_512_ROUNDS_TOTAL (8*((((SKEIN_ROUNDS/ 10) + 5) % 10) + 5))
 #define SKEIN1024_ROUNDS_TOTAL (8*((((SKEIN_ROUNDS    ) + 5) % 10) + 5))
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif  /* ifndef _SKEIN_H_ */
