@@ -1,7 +1,6 @@
 {-# CFILES
       c_impl/reference/skein.c
-      c_impl/reference/skein_block.c
- #-}
+      c_impl/reference/skein_block.c #-}
 
 -----------------------------------------------------------------------------
 -- |
