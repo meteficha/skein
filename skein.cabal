@@ -46,8 +46,6 @@ Extra-source-files:
     c_impl/reference/skein_debug.h
     c_impl/reference/skein_port.h
     tests/runtests.hs
-
-Data-files:
     tests/skein_golden_kat.txt
 
 Source-repository head
