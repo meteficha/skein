@@ -32,6 +32,7 @@ Description:
     before 1.0.0 implemented Skein v1.1.
 
 Extra-source-files:
+    c_impl/optimized/brg_endian.h
     c_impl/optimized/skein.c
     c_impl/optimized/skein.h
     c_impl/optimized/skein_block.c
