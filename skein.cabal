@@ -75,7 +75,7 @@ Library
     Build-depends:
         base         >= 3   && < 5,
         bytestring   >= 0.9,
-        cereal       >= 0.3 && < 0.5,
+        cereal       >= 0.3 && < 0.6,
         tagged       >= 0.2 && < 0.9,
         crypto-api   >= 0.6 && < 0.14
 
@@ -123,7 +123,7 @@ Test-suite runtests
     Build-depends:
         base         >= 3   && < 5,
         bytestring   >= 0.9,
-        cereal       >= 0.3 && < 0.5,
+        cereal       >= 0.3 && < 0.6,
         tagged       >= 0.2 && < 0.9,
         crypto-api   >= 0.6 && < 0.14,
 
